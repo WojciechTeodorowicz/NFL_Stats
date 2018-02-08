@@ -7,8 +7,8 @@ import os
 
 def import_content(filepath):
     mng_client = pymongo.MongoClient('localhost', 27017)
-    mng_db = mng_client['db'] 
-    collection_name = 'data' 
+    mng_db = mng_client['test'] 
+    collection_name = 'players' 
     db_cm = mng_db[collection_name]
     cdir = os.path.dirname(__file__)
     file_res = os.path.join(cdir, filepath)
