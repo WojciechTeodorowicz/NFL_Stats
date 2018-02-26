@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Nfl_Stats</title>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js'></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.16.0/jquery.validate.min.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <script type="text/javascript">
+            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+        </script>
+    </head>
+    <div class="ui-widget container">
+        <form id="playerSearch">
+            <div class="form-group row">
+                <div class="col-xs-2">
+                    <label style="display:block;">Name:</label>
+                    <input type="text" id="playerName" placeholder="Player Name" class="form-control">
+                </div>
+            <input type="hidden" id="playerId">
+                <div class="col-xs-2">
+                    <label style="display:block;">Year:</label>
+                    <select id="year_select" class="form-control">
+                        <option value="2009">2009</option>
+                        <option value="2010">2010</option>
+                        <option value="2011">2011</option>
+                        <option value="2012">2012</option>
+                        <option value="2013">2013</option>
+                        <option value="2014">2014</option>
+                        <option value="2015">2015</option>
+                        <option value="2016" selected>2016</option>
+                        <option value="All">All Years</option>
+                    </select>
+                </div>
+                <div class="col-xs-2">
+                    <label style="display:block;">Phase:</label>
+                    <select id="phase_select" class="form-control">
+                        <option value="All">Full Season</option>
+                        <option value="Preseason">Preseason</option>
+                        <option value="Regular" selected>Regular</option>
+                        <option value="Postseason">Postseason</option>
+                    </select>
+                </div>
+                <div class="btn-group col-xs-4" data-toggle="buttons">
+                    <div class="col-xs-5">
+                        <label style="display:block;">Week:</label>
+                        <input class="form-control" type="text" id="week_select">
+                    </div>
+                    <label class="btn btn-success" autocomplete="off" id="week_select_chkbx">
+                        <input type="checkbox" value="All" id="week_select_all">All
+                    </label>
+                </div>
+                <button class="btn btn-primary" id="search">Search</button>
+            </div>
+        </form>
+        <div id="player_info"></div>
+    </div>
+
+    <script>
+    </script>
+<body>

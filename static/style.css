@@ -1,0 +1,21 @@
+/*
+ * style.css
+ * Copyright (C) 2017 sboynton
+ *
+ * Distributed under terms of the MIT license.
+ */
+
+body {
+	background: white;
+	color: black;
+}
+
+#week_select_chkbx {
+    margin-top: 26px;
+    margin-left: -17px;
+}
+
+#search {
+    margin-top: 26px;
+    height: 34px;
+}
