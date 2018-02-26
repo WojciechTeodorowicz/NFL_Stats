@@ -1,71 +1,70 @@
-"""
-authors: Wojciech Teodorowicz, Sahan Ekanayake-close enough :)
-
-This file contains all the player stats conversion and data
-
-
-"""
-from flask import Flask
-from flask import render_template
-import pymongo
-from pymongo import MongoClient
-import os.path
 import json
-
+import nflgame
+import nfldb
+import requests
+from stat_names import stat_names
+import sys
+from flask import Flask, request, jsonify, session
+from flask import render_template
 app = Flask(__name__)
+app.secret_key = "super secret key"
 
-#import the json file
-
-_player_json_file = os.path.join(os.path.dirname(__file__), 'players.json')
+db = nfldb.connect()
 
 @app.route("/")
-def read_players(player_file=None):
-    if player_file is None:
-        player_file = _player_json_file
-        try:
-            data = json.loads(open(player_file).read())
-        except IOError:
-            return {}
-        
-        #make player list
-        
-        players = {}
-        players_weight = {}
-        #get player ID from json file = data.
-        
-        for player_ID in data:
-            for player_weight in data:
-                players_weight[player_weight] = Player_data(data[player_weight])
-                players[player_ID] = Player_data(data[player_ID])
-                values = [player_weight]
-                colors = [ "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA","#ABCDEF", "#DDDDDD", "#ABCABC"  ]
-                return render_template('chart.html',players = players, set=zip(players, values, colors))
-    
+def index():
+    return render_template('index.html')
 
+@app.route("/player/<player_id>")
+@app.route("/player/<player_id>/<int:year>")
+@app.route("/player/<player_id>/<int:year>/<phase>")
+@app.route("/player/<player_id>/<int:year>/<phase>/<int:week>")
+def player_info(player_id, year="All", phase="All", week="All"):
+    player = nfldb.Player.from_id(db, player_id)
+    p = nfldb.Query(db).game()
 
-class Player_data(object):
-                                   
-    def __init__(self, data):
-        """
-        Assign all the values from the json file to new variables
-        the values are birth date age weight...
+    if (phase == "Preseason") or (phase == "Regular") or (phase == "Postseason"):
+        p.game(season_type=phase)
+    if 2009 <= int(year) <= 2016:
+        p.game(season_year=year)
+    if 1 <= int(week) <= 17:
+        p.game(week=week)
 
-        """
-        self.data = data
-        self.player_ID = data['gsis_id']
-        self.gsis_name = data.get('gsis_name', '')
-        self.player_fullname = data.get('full_name', '')
-        self.player_first_name = data.get('first_name', '')
-        self.player_last_name = data.get('last_name', '')
-        self.player_weight = data.get('weight','')
-        self.player_height = data.get('height' , '')
-        self.player_birth = data.get('birthdate', '')
-        self.player_pro_years = data.get('years_pro', '')
-        self.player_team = data.get('data', '')
-    """
-    Here we will need to think of a lagorithm to analyze the data we will use python
-    and html for the display with chart.js
-    """
+    p.player(gsis_name=player.gsis_name, team=player.team)
+    stats = p.as_aggregate()
+
+    stat_list = {}
+    for stat in stats:
+        for field in stat.fields:
+            # Reverse this so it joins properly with category list
+            stat_list[field] = int(getattr(stat, field))
+
+    session['prev_year'] = year
+    session['prev_phase'] = phase
+    session['prev_week'] = week
+    session['prev_player_id'] = str(player.player_id)
+    session['prev_player_name'] = str(player.full_name)
+
+    return render_template('player.html', player=player, stats=stat_list, stat_names=stat_names, session=session)
+
+@app.route("/_players")
+def players():
+    name = request.args.get('name')
+
+    player_list = []
+
+    player, dist = nfldb.player_search(db, name)
+    data = {
+            'label': player.full_name + " (" + player.team + ", " + str(player.position) + ")",
+            'value': player.full_name,
+            'id': player.player_id,
+            }
+    player_list.append(data)
+
+    return jsonify(matching_results=player_list)
+@app.route("/_player_info/<player_id>")
+def render_player_stats(player_id):
+    pass
 
 if __name__ == "__main__":
     app.run(host='localhost')

@@ -22,7 +22,7 @@
 #
 # Datetimes are always stored as UTC, but this time zone setting
 # can be used to change how datetimes are returned in SELECT queries.
-timezone = GMT
+timezone = US/Eastern
 
 # The name of the PostgreSQL database containing NFL data.
 database = nfldb
@@ -32,7 +32,7 @@ database = nfldb
 # Also, the user should have permission to create/alter/drop tables,
 # indexes and types.
 user = nfldb
-password = 1234
+password = YOUR PASSWORD
 
 # The host of the PostgreSQL server. When using a local database, this should
 # be set to "localhost".
